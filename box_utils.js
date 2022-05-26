@@ -167,14 +167,14 @@ async function generate_boxes(probs, offsets, scale, threshold){
 
 //test generate_boxes
 // probs shape [4, 3, 2]
-// probs = tf.tensor([[[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]], [[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]], [[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]], [[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]]])
+probs = tf.tensor([[[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]], [[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]], [[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]], [[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]]])
 // probs = tf.tensor([[[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]], [[0.1, 0.2], [0.5, 0.6], [0.7, 0.8]]])
 
 // 2,3,2 to 2,3
 // probs = probs[:, :, 1] 3 dimension to 2 dimension
-// probs = tf.slice(probs, [0, 0, 1], [-1, -1, 1])
+probs = tf.slice(probs, [0, 0, 1], [-1, -1, 1])
 // probs = tf.squeeze(probs, [2])
-// probs.print()
+probs.print()
 // console.log(probs.shape)
 // offsets = tf.tensor([[[0.1, 0.2, 0.3, 0.4], [0.5, 0.6, 0.7, 0.8]], [[0.1, 0.2, 0.3, 0.4], [0.5, 0.6, 0.7, 0.8]]])
 
