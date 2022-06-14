@@ -1,6 +1,6 @@
 {
   "name": "@whoisltd/mtcnn-tfjs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Implement MTCNN with TensorFlow.js",
   "main": "detect.js",
   "type": "commonjs",
