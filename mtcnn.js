@@ -1,5 +1,5 @@
 const tf = require('@tensorflow/tfjs-node');
-const {PNet, RNet, ONet} = require('./models');
+const Model = require('./models');
 const {calibrate_box, convert_to_square, get_image_boxes, generate_boxes, preprocess} = require('./box_utils');
 
 
@@ -9,9 +9,9 @@ DEF_NMS_THRESHOLDS = [0.6, 0.6, 0.6]
 class MTCNN{
     // Top level class for mtcnn detection.
     constructor(pnet_path, rnet_path, onter_path, min_face_size=20.0, thresholds=null, mns_thresholds=null, max_output_size=300){
-        this.pnet = PNet(pnet_path)
-        this.rnet = RNet(rnet_path)
-        this.onet = ONet(onter_path)
+        this.pnet = Model(pnet_path)
+        this.rnet = Model(rnet_path)
+        this.onet = Model(onter_path)
         this.min_face_size = min_face_size
         this.thresholds = thresholds || DEF_THRESHOLDS
         this.mns_thresholds = mns_thresholds || DEF_NMS_THRESHOLDS

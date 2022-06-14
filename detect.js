@@ -4,11 +4,13 @@ const fs = require('fs');
 var MTCNN = require('./mtcnn');
 const canvas = require('canvas');
 
+const pnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json'
+const rnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json'
+const onet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json'
+
 function load_model()
 {
-    mtcnn = new MTCNN('https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json',
-    'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json', 
-    'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json');
+    mtcnn = new MTCNN(pnet_url, rnet_url, onet_url);
     return mtcnn
 }
 
