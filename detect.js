@@ -71,7 +71,7 @@ async function draw_img(img_url, output_url=null) {
     })
 
 }
-async function crop_face(img_url, output_url = null) {
+async function crop_face(img_url, output_url = null, return_img = false) {
     const data = await detect(img_url)
     var {tensor} = await load_img(img_url)
     const boxes = data.boxes
@@ -83,13 +83,15 @@ async function crop_face(img_url, output_url = null) {
     }
 
     var cropped = tf.slice(tensor, [boxes[1], boxes[0]], [boxes[3]-boxes[1], boxes[2]-boxes[0]])
-    if (output_url != null){
-        tf.node.encodeJpeg(cropped).then((f) => {
-            fs.writeFileSync(output_url, f)});
-    }
-    else{
-        tf.node.encodeJpeg(cropped).then((f) => {
-            fs.writeFileSync('cropped.jpg', f)});
+    if (return_img){
+        if (output_url != null){
+            tf.node.encodeJpeg(cropped).then((f) => {
+                fs.writeFileSync(output_url, f)});
+        }
+        else{
+            tf.node.encodeJpeg(cropped).then((f) => {
+                fs.writeFileSync('cropped.jpg', f)});
+        }
     }
     return cropped
 
@@ -116,6 +118,3 @@ async function detect(img_url) {
 exports.detect = detect;
 exports.draw_img = draw_img;
 exports.crop_face = crop_face;
-// crop_face('/home/whoisltd/Desktop/dat.jpg')
-// draw_img('/home/whoisltd/Desktop/dat.jpg')
-// detect('/home/whoisltd/Desktop/dat.jpg')
