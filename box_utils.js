@@ -1,4 +1,4 @@
-const tf = require('@tensorflow/tfjs');
+const tf = require('@tensorflow/tfjs-node');
 
 function convert_to_square(boxes){
     // """Convert bounding boxes to a square form.

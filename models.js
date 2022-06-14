@@ -1,4 +1,4 @@
-const tf = require('@tensorflow/tfjs')
+const tf = require('@tensorflow/tfjs-node')
 
 async function PNet(model_url = null){
     // """ Proposal Network, receives an image and outputs

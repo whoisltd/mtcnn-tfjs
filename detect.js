@@ -3,14 +3,16 @@ const sharp = require('sharp');
 const fs = require('fs');
 var MTCNN = require('./mtcnn');
 const canvas = require('canvas');
-const path = require('path');
 
-async function detect(img_url, draw = false, crop = false) {
-    // """mtcnn image demo"""
-    mtcnn = new MTCNN('file://' + path.join(__dirname, 'final_model/pnet/model.json'),
-    'file://' + path.join(__dirname, 'final_model/rnet/model.json'), 
-    'file://' + path.join(__dirname, 'final_model/onet/model.json'));
-    
+function load_model()
+{
+    mtcnn = new MTCNN('https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json',
+    'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json', 
+    'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json');
+    return mtcnn
+}
+
+async function load_img(img_url){
     try {
         var img = await sharp(img_url).rotate().toBuffer()
     } catch (error) {
@@ -21,9 +23,82 @@ async function detect(img_url, draw = false, crop = false) {
     try {
         var tensor = tf.node.decodeImage(img)
     } catch (error) {
-        console.log("Error: " + error);
+        console.log(error);
         return;
     }
+    return {img, tensor}
+}
+async function draw_img(img_url, output_url=null) {
+
+    const data = await detect(img_url)
+    var {img} = await load_img(img_url)
+    const boxes = data.boxes
+
+    // """Draw bounding boxes on image"""
+    canvas.loadImage(img).then(image => {
+        const ct = canvas.createCanvas(image.width, image.height)
+        const ctx = ct.getContext('2d');
+        
+        ctx.drawImage(image, 0, 0);
+        ctx.beginPath()
+        ctx.rect(boxes[0], boxes[1], boxes[2]-boxes[0], boxes[3]-boxes[1])
+        ctx.strokeStyle = 'red'
+        ctx.lineWidth = 4
+        ctx.stroke()
+        ctx.closePath()
+
+        
+        if (output_url == null){
+            var img_out = ct.toBuffer('image/jpeg')
+            fs.writeFileSync('draw.jpg', img_out)
+            return;
+        }
+
+        var fileExt = output_url.split('.').pop();
+        var img_out = null
+        if (fileExt == 'jpg' || fileExt == 'jpeg') {
+            img_out = ct.toBuffer('image/jpeg')
+        }
+        else if (fileExt == 'png'){
+            img_out = ct.toBuffer('image/png')
+        }
+        else {
+            console.log('Output type is not supported')
+            return;
+        }
+        fs.writeFileSync(output_url, img_out)
+        
+    })
+
+}
+async function crop_face(img_url, output_url = null) {
+    const data = await detect(img_url)
+    var {tensor} = await load_img(img_url)
+    const boxes = data.boxes
+
+    // crop face
+
+    for (let i = 0; i < 4; i++){
+        boxes[i] = Math.round(boxes[i])
+    }
+
+    var cropped = tf.slice(tensor, [boxes[1], boxes[0]], [boxes[3]-boxes[1], boxes[2]-boxes[0]])
+    if (output_url != null){
+        tf.node.encodeJpeg(cropped).then((f) => {
+            fs.writeFileSync(output_url, f)});
+    }
+    else{
+        tf.node.encodeJpeg(cropped).then((f) => {
+            fs.writeFileSync('cropped.jpg', f)});
+    }
+    return cropped
+
+}
+async function detect(img_url) {
+    // """mtcnn image demo"""
+    var mtcnn = load_model()
+    
+    var {tensor} = await load_img(img_url)
     
     data = await mtcnn.detect(tensor);
 
@@ -31,37 +106,6 @@ async function detect(img_url, draw = false, crop = false) {
     const landmarks = data['landmarks'].arraySync()[0]
     const scores = data['scores'].arraySync()[0]
 
-    // """Draw bounding boxes on image"""
-    if (draw){
-        canvas.loadImage(img).then(image => {
-            const ct = canvas.createCanvas(image.width, image.height)
-            const ctx = ct.getContext('2d');
-            
-            ctx.drawImage(image, 0, 0);
-            ctx.beginPath()
-            ctx.rect(boxes[0], boxes[1], boxes[2]-boxes[0], boxes[3]-boxes[1])
-            ctx.strokeStyle = 'red'
-            ctx.lineWidth = 4
-            ctx.stroke()
-            ctx.closePath()
-
-            var img_out = ct.toBuffer('image/jpeg')
-    
-            fs.writeFileSync('draw.jpg', img_out)
-        })
-    }
-
-    // crop face
-    if (crop){
-        for (let i = 0; i < 4; i++){
-            boxes[i] = Math.round(boxes[i])
-        }
-    
-        var cropped = tf.slice(tensor, [boxes[1], boxes[0]], [boxes[3]-boxes[1], boxes[2]-boxes[0]])
-    
-        tf.node.encodeJpeg(cropped).then((f) => {
-            fs.writeFileSync("cropped.jpg", f)});
-    }
     const dict = {}
     dict['boxes'] = boxes
     dict['landmarks'] = landmarks
@@ -70,3 +114,8 @@ async function detect(img_url, draw = false, crop = false) {
 }
 
 exports.detect = detect;
+exports.draw_img = draw_img;
+exports.crop_face = crop_face;
+// crop_face('/home/whoisltd/Desktop/dat.jpg')
+// draw_img('/home/whoisltd/Desktop/dat.jpg')
+// detect('/home/whoisltd/Desktop/dat.jpg')
