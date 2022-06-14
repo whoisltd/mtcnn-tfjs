@@ -10,7 +10,7 @@ A face detection framework with MTCNN and Tensorflow.js
 
 Run:
 ```
-npm i mtcnn-tfjs
+npm install @whoisltd/mtcnn-tfjs@1.0.0
 ```
 
 Use:
