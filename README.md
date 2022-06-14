@@ -17,7 +17,7 @@ npm install @whoisltd/mtcnn-tfjs@1.0.2
 
 Use:
  ```
-const mtcnn = require('mtcnn-tfjs');
+const mtcnn = require('@whoisltd/mtcnn-tfjs');
 
 mtcnn.detect(url_img, true);
 ```
