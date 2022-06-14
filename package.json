@@ -1,6 +1,6 @@
 {
-  "name": "mtcnn-tfjs",
-  "version": "1.0.3",
+  "name": "@whoisltd/mtcnn-tfjs",
+  "version": "1.0.1",
   "description": "Implement MTCNN with TensorFlow.js",
   "main": "detect.js",
   "type": "commonjs",
@@ -18,6 +18,9 @@
   },
   "directories": {
     "lib": "lib"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "repository": {
     "type": "git",
