@@ -3,6 +3,7 @@ Implement mtcnn with Tensorflow.js
 ## What is this?
 
 A face detection framework with MTCNN and Tensorflow.js
+
 (Currently, the model is only accepted to detect one face, i'll update soon)
 
 ## Installation
