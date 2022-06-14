@@ -6,7 +6,7 @@ A face detection framework with MTCNN and Tensorflow.js
 
 Give me a star, if you like it <3
 
-(Currently, the model is only accepted to detect one face, i'll update soon)
+(Currently, framework is only accepted to detect one face, i'll update soon)
 
 ## Installation
 
