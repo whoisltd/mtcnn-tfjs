@@ -3,7 +3,7 @@ const {PNet, RNet, ONet} = require('./models');
 const {calibrate_box, convert_to_square, get_image_boxes, generate_boxes, preprocess} = require('./box_utils');
 
 
-DEF_THRESHOLDS = [0.5, 0.5, 0.5]
+DEF_THRESHOLDS = [0.5, 0.5, 0.9]
 DEF_NMS_THRESHOLDS = [0.6, 0.6, 0.6]
 
 class MTCNN{
@@ -40,14 +40,14 @@ class MTCNN{
         if (boxes.shape[0] == 0){
             return []
         }
-        console.log('shape', boxes.shape)
+
         boxes = await this.stage_two(img, boxes, height, width, boxes.shape[0])
+
         if (boxes.shape[0] == 0){
             return []
         }
         
         const data = await this.stage_three(img, boxes, height, width, boxes.shape[0])
-
         const boxess = data['boxes']
         const landmarks = data['landmarks']
         const scores = data['scores']
@@ -70,6 +70,7 @@ class MTCNN{
         if (min_length in this.scale_cache){
             return this.scale_cache[min_length]
         }
+
         const min_detection_size = 12.0
         const factor = 0.707
         const scales = []
@@ -101,6 +102,7 @@ class MTCNN{
         // Returns:
         //     float tensor of shape [n, 9]
         // """
+
         var hs = tf.ceil(tf.mul(height, scale))
         var ws = tf.ceil(tf.mul(width, scale))
 
@@ -133,7 +135,6 @@ class MTCNN{
         // Returns:
         //     float tensor of shape [n, 4]
         // """
-
 
         var boxess = tf.slice(boxes, [0,0], [-1,4])
         const scores = tf.reshape(tf.slice(boxes, [0,3], [-1,1]), [-1])
@@ -189,7 +190,7 @@ class MTCNN{
         // Returns:
         //     float tensor of shape [n, 4], predicted bounding boxes
         // """
-        console.log('stage 2 ', img.shape, boxes.shape, height, width, num_boxes)
+
         var img_boxes = get_image_boxes(boxes, img, height, width, num_boxes, 24)
         const data =  (await this.rnet).predict(img_boxes)
         
@@ -197,18 +198,13 @@ class MTCNN{
         var offsets = data[1]
 
         const slice_probs = tf.reshape(tf.slice(probs, [0,1], [-1,1]), [-1])
-        slice_probs.print()
-        const a = await tf.whereAsync(tf.greater(slice_probs, this.thresholds[1]))
-        console.log(slice_probs, a)
         var keep = tf.reshape(tf.slice(await tf.whereAsync(tf.greater(slice_probs, this.thresholds[1])), [0,0], [-1,1]), [-1])
-        console.log('that oke?', keep.shape)
         boxes = tf.gather(boxes, keep)
         
         offsets = tf.gather(offsets, keep)
         const scores = tf.gather(tf.reshape(tf.slice(probs, [0,1], [-1,1]), [-1]), keep)
-        console.log('that oke?', boxes.shape)
+
         boxes = calibrate_box(boxes, offsets)
-        
         boxes = convert_to_square(boxes)
         
         keep = tf.image.nonMaxSuppression(boxes, scores, this.max_output_size, this.mns_thresholds[1])
@@ -265,7 +261,7 @@ class MTCNN{
         boxes = tf.gather(boxes, keep)
         scores = tf.gather(scores, keep)
         landmarks = tf.gather(landmarks, keep)
-        return {'boxes': boxes, 'landmarks': landmarks, 'scores': landmarks}
+        return {'boxes': boxes, 'landmarks': landmarks, 'scores': scores}
     }   
 }
 
