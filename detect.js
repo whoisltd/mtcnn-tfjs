@@ -78,4 +78,4 @@ async function detect(img_url, img_output, crop = false) {
     return dict
 }
 
-export default detect
+exports.detect = detect;
