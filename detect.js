@@ -3,12 +3,13 @@ const sharp = require('sharp');
 const fs = require('fs');
 var MTCNN = require('./mtcnn');
 const canvas = require('canvas');
+const path = require('path');
 
 async function detect(img_url, img_output, crop = false) {
     // """mtcnn image demo"""
-    mtcnn = new MTCNN('file://final_model/pnet/model.json',
-                    'file://final_model/rnet/model.json', 
-                    'file://final_model/onet/model.json');
+    mtcnn = new MTCNN('file://' + path.join(__dirname, 'final_model/pnet/model.json'),
+    'file://' + path.join(__dirname, 'final_model/rnet/model.json'), 
+    'file://' + path.join(__dirname, 'final_model/onet/model.json'));
     
     const img = await sharp(img_url).rotate().toBuffer()
     var tensor = tf.node.decodeImage(img)
