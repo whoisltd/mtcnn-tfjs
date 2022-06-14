@@ -11,8 +11,20 @@ async function detect(img_url, img_output, crop = false) {
     'file://' + path.join(__dirname, 'final_model/rnet/model.json'), 
     'file://' + path.join(__dirname, 'final_model/onet/model.json'));
     
-    const img = await sharp(img_url).rotate().toBuffer()
-    var tensor = tf.node.decodeImage(img)
+    try {
+        const img = await sharp(img_url).rotate().toBuffer()
+    } catch (error) {
+        console.log(error);
+        return;
+    }
+    
+    try {
+        var tensor = tf.node.decodeImage(img)
+    } catch (error) {
+        console.log("Error: " + error);
+        return;
+    }
+    
     data = await mtcnn.detect(tensor);
 
     const boxes = data['boxes'].arraySync()[0]
@@ -32,6 +44,9 @@ async function detect(img_url, img_output, crop = false) {
         ctx.stroke()
         ctx.closePath()
 
+        if (img_output == null){
+            img_output = 'output.jpg'
+        }
         var fileExt = img_output.split('.').pop();
         var img_out = null
         if (fileExt == 'jpg' || fileExt == 'jpeg') {
