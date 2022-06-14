@@ -12,7 +12,7 @@ Give me a star, if you like it <3
 
 Run:
 ```
-npm install @whoisltd/mtcnn-tfjs@1.0.2
+npm install @whoisltd/mtcnn-tfjs
 ```
 
 Use:
