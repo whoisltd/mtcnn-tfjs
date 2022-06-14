@@ -17,7 +17,7 @@ Use:
  ```
 const mtcnn = require('mtcnn-tfjs');
 
-mtcnn.detect(url_img, out_url);
+mtcnn.detect(url_img, true);
 ```
 
 ## Demo
