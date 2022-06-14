@@ -19,7 +19,15 @@ Use:
  ```
 const mtcnn = require('@whoisltd/mtcnn-tfjs');
 
-mtcnn.detect(url_img, true);
+//Draw bounding boxes on image:
+mtcnn.draw_img(url_img, url_output);
+
+//Crop face from image:
+mtcnn.crop_face(url_img, url_output, true);
+
+//Get bounding boxes, landmarks, score
+mtcnn.detect(url_img);
+
 ```
 
 ## Demo
