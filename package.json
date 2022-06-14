@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Implement MTCNN with TensorFlow.js",
   "main": "detect.js",
+  "type":"module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
