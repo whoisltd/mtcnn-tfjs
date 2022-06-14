@@ -12,7 +12,7 @@ async function detect(img_url, img_output, crop = false) {
     'file://' + path.join(__dirname, 'final_model/onet/model.json'));
     
     try {
-        const img = await sharp(img_url).rotate().toBuffer()
+        var img = await sharp(img_url).rotate().toBuffer()
     } catch (error) {
         console.log(error);
         return;
