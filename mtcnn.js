@@ -32,8 +32,8 @@ class MTCNN{
         //     scores: float tensor of shape [n], confidence scores
         // """
 
-        const height = img.shape[0]
-        const width = img.shape[1]
+        var [height, width] = img.shape
+        
         const scales = this.get_scale(height, width)
 
         var boxes = await this.stage_one(img, scales)
@@ -48,10 +48,7 @@ class MTCNN{
         }
         
         const data = await this.stage_three(img, boxes, height, width, boxes.shape[0])
-        const boxess = data['boxes']
-        const landmarks = data['landmarks']
-        const scores = data['scores']
-        return {'boxes': boxess, 'landmarks': landmarks, 'scores': scores}
+        return data
     }
 
     get_scale(height, width){
@@ -109,9 +106,10 @@ class MTCNN{
         var img_in = tf.image.resizeBilinear(img, [hs.dataSync()[0], ws.dataSync()[0]])
         img_in = preprocess(img_in)
         img_in = tf.expandDims(img_in, 0)
-        const data = (await this.pnet).predict(img_in) // probs, offsets
-        const probs = data[0]
-        const offsets = data[1]
+        const data = (await this.pnet).predict(img_in) 
+        
+        // probs, offsets
+        var [probs, offsets] = data
 
         const probs_zero = tf.tensor(probs.arraySync()[0])
         const offsets_zero = tf.tensor(offsets.arraySync()[0])
@@ -160,8 +158,7 @@ class MTCNN{
         //     float tensor of shape [n, 4], predicted bounding boxes
         // """
 
-        const height = img.shape[0]
-        const width = img.shape[1]
+        const [height, width] = img.shape
         var boxes = []
 
         for (let i = 0; i < scales.length; i++){
@@ -192,10 +189,9 @@ class MTCNN{
         // """
 
         var img_boxes = get_image_boxes(boxes, img, height, width, num_boxes, 24)
-        const data =  (await this.rnet).predict(img_boxes)
+        const data = (await this.rnet).predict(img_boxes)
         
-        const probs = data[0]
-        var offsets = data[1]
+        var [probs, offsets] = data
 
         const slice_probs = tf.reshape(tf.slice(probs, [0,1], [-1,1]), [-1])
         var keep = tf.reshape(tf.slice(await tf.whereAsync(tf.greater(slice_probs, this.thresholds[1])), [0,0], [-1,1]), [-1])
@@ -234,9 +230,7 @@ class MTCNN{
         
         const data = (await this.onet).predict(img_boxes)
 
-        const probs = data[0]
-        var offsets = data[1]
-        var landmarks = data[2] 
+        var [probs, offsets, landmarks] = data
 
         const slice_probs = tf.reshape(tf.slice(probs, [0,1], [-1,1]), [-1])
         var keep = tf.reshape(tf.slice(await tf.whereAsync(tf.greater(slice_probs, this.thresholds[2])), [0,0], [-1,1]), [-1])
@@ -258,10 +252,10 @@ class MTCNN{
                     ], 1)
         boxes = calibrate_box(boxes, offsets)
         keep = tf.image.nonMaxSuppression(boxes, scores, this.max_output_size, this.mns_thresholds[2])
-        boxes = tf.gather(boxes, keep)
-        scores = tf.gather(scores, keep)
-        landmarks = tf.gather(landmarks, keep)
-        return {'boxes': boxes, 'landmarks': landmarks, 'scores': scores}
+        boxes = tf.gather(boxes, keep).arraySync()[0]
+        scores = tf.gather(scores, keep).arraySync()[0]
+        landmarks = tf.gather(landmarks, keep).arraySync()[0]
+        return {boxes, landmarks, scores}
     }   
 }
 

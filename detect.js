@@ -3,16 +3,18 @@ const sharp = require('sharp');
 const fs = require('fs');
 var MTCNN = require('./mtcnn');
 const canvas = require('canvas');
-
-const pnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json'
-const rnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json'
-const onet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json'
+const url = 'https://digitalwallet-poc-storage-s3.s3.ap-southeast-1.amazonaws.com/ai_temp/mtcnn/'
+const pnet_url = url + 'pnet/model.json'
+const rnet_url = url + 'rnet/model.json'
+const onet_url = url + 'onet/model.json'
 
 function load_model()
 {
     mtcnn = new MTCNN(pnet_url, rnet_url, onet_url);
     return mtcnn
 }
+
+var mtcnn = load_model()
 
 async function load_img(img_url){
     try {
@@ -100,15 +102,12 @@ async function crop_face(img_url, output_url = null, return_img = false) {
 }
 async function detect(img_url) {
     // """mtcnn image demo"""
-    var mtcnn = load_model()
     
     var {tensor} = await load_img(img_url)
     
     data = await mtcnn.detect(tensor);
 
-    const boxes = data['boxes'].arraySync()[0]
-    const landmarks = data['landmarks'].arraySync()[0]
-    const scores = data['scores'].arraySync()[0]
+    const {boxes, landmarks, scores} = data
 
     const dict = {}
     dict['boxes'] = boxes
@@ -117,6 +116,7 @@ async function detect(img_url) {
     return dict
 }
 
-exports.detect = detect;
-exports.draw_img = draw_img;
-exports.crop_face = crop_face;
+// exports.detect = detect;
+// exports.draw_img = draw_img;
+// exports.crop_face = crop_face;
+draw_img('/home/whoisltd/Desktop/as12.jpg')
