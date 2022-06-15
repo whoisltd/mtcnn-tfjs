@@ -116,7 +116,7 @@ async function detect(img_url) {
     return dict
 }
 
-// exports.detect = detect;
-// exports.draw_img = draw_img;
-// exports.crop_face = crop_face;
-draw_img('/home/whoisltd/Desktop/as12.jpg')
+exports.detect = detect;
+exports.draw_img = draw_img;
+exports.crop_face = crop_face;
+// draw_img('/home/whoisltd/Desktop/as12.jpg')
