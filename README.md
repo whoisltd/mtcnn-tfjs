@@ -12,7 +12,7 @@ Give me a ⭐️, if you like it ❤️
 
 Run:
 ```
-npm install @whoisltd/mtcnn-tfjs
+npm install whoisltd/mtcnn-tfjs
 ```
 
 Use:
