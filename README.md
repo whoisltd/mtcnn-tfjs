@@ -12,21 +12,29 @@ Give me a ⭐️, if you like it ❤️
 
 Run:
 ```
-npm install @whoisltd/mtcnn-tfjs
+npm install whoisltd/mtcnn-tfjs
 ```
 
 Use:
  ```node
 const mtcnn = require('@whoisltd/mtcnn-tfjs');
 
+const pnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json'
+
+const rnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json'
+
+const onet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json'
+
+const model = new mtcnn.MTCNN(pnet_url, rnet_url, onet_url)
+
 //Draw bounding boxes on image:
-mtcnn.draw_img(url_img, url_output);
+model.draw_img(url_img, url_output);
 
 //Crop face from image:
-mtcnn.crop_face(url_img, url_output, true);
+model.crop_face(url_img, url_output, true);
 
 //Get bounding boxes, landmarks, score:
-mtcnn.detect(url_img);
+model.detect(url_img);
 
 ```
 
