@@ -85,12 +85,6 @@ class MTCNN {
 
         // crop face
 
-        for (let i = 0; i < 4; i++){
-            if (boxes[i] < 0){
-                boxes[i] = 0
-            }
-        }
-
         var cropped = tf.slice(tensor, [boxes[1], boxes[0]], [boxes[3]-boxes[1], boxes[2]-boxes[0]])
         if (return_img){
             if (output_url != null){
@@ -113,6 +107,12 @@ class MTCNN {
         var data = await this.mtcnn.detect(tensor);
 
         const {boxes, landmarks, scores} = data
+
+        for (let i = 0; i < 4; i++){
+            if (boxes[i] < 0){
+                boxes[i] = 0
+            }
+        }
 
         const dict = {}
         dict['boxes'] = boxes
