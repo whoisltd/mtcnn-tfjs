@@ -86,7 +86,9 @@ class MTCNN {
         // crop face
 
         for (let i = 0; i < 4; i++){
-            boxes[i] = Math.round(boxes[i])
+            if (boxes[i] < 0){
+                boxes[i] = 0
+            }
         }
 
         var cropped = tf.slice(tensor, [boxes[1], boxes[0]], [boxes[3]-boxes[1], boxes[2]-boxes[0]])
