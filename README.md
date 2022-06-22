@@ -1,5 +1,7 @@
 # mtcnn-tfjs
 Implement mtcnn with Tensorflow.js
+
+[![CodeFactor](https://www.codefactor.io/repository/github/whoisltd/mtcnn-tfjs/badge)](https://www.codefactor.io/repository/github/whoisltd/mtcnn-tfjs)
 ## What is this?
 
 A face detection framework with MTCNN and Tensorflow.js
