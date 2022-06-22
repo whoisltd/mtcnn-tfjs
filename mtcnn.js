@@ -3,7 +3,7 @@ const Model = require('./models');
 const {calibrate_box, convert_to_square, get_image_boxes, generate_boxes, preprocess} = require('./box_utils');
 
 
-DEF_THRESHOLDS = [0.5, 0.5, 0.9]
+DEF_THRESHOLDS = [0.7, 0.8, 0.9]
 DEF_NMS_THRESHOLDS = [0.6, 0.6, 0.6]
 
 class MTCNN{
@@ -119,7 +119,7 @@ class MTCNN{
         }
 
         const keep = tf.image.nonMaxSuppression(tf.slice(boxes, [0,0], [-1,4]), 
-        tf.reshape(tf.slice(boxes, [0,3], [-1,1]), [-1]), 
+        tf.reshape(tf.slice(boxes, [0,4], [-1,1]), [-1]), 
         this.max_output_size, 0.5)
         return tf.gather(boxes, keep)
     }
@@ -135,7 +135,7 @@ class MTCNN{
         // """
 
         var boxess = tf.slice(boxes, [0,0], [-1,4])
-        const scores = tf.reshape(tf.slice(boxes, [0,3], [-1,1]), [-1])
+        const scores = tf.reshape(tf.slice(boxes, [0,4], [-1,1]), [-1])
         const offsets = tf.slice(boxes, [0,5], [-1,-1]) 
 
 

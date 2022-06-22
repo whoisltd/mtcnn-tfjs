@@ -108,11 +108,8 @@ class MTCNN {
 
         const {boxes, landmarks, scores} = data
 
-        for (let i = 0; i < 4; i++){
-            if (boxes[i] < 0){
-                boxes[i] = 0
-            }
-        }
+        boxes[0] = Math.max(0, boxes[0])
+        boxes[1] = Math.max(0, boxes[1])
 
         const dict = {}
         dict['boxes'] = boxes
@@ -122,11 +119,11 @@ class MTCNN {
     }
 }
 
-exports.MTCNN = MTCNN;
+// exports.MTCNN = MTCNN;
 
-// const pnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json'
-// const rnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json'
-// const onet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json'
-// mtn = new MTCNN(pnet_url, rnet_url, onet_url)
+const pnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json'
+const rnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json'
+const onet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json'
+mtn = new MTCNN(pnet_url, rnet_url, onet_url)
 
-// mtn.crop_face('/home/whoisltd/Desktop/dat.jpg', null, true)
+mtn.crop_face('/home/whoisltd/Desktop/dat.jpg', null, true)
