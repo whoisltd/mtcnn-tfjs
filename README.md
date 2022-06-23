@@ -27,7 +27,13 @@ const rnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/rne
 
 const onet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json'
 
-const model = new mtcnn.MTCNN(pnet_url, rnet_url, onet_url)
+let model = null
+if(model == null){
+    model = new mtcnn.MTCNN(pnet_url, rnet_url, onet_url)
+    model.mtcnn.pnet = await model.mtcnn.pnet
+    model.mtcnn.rnet = await model.mtcnn.rnet
+    model.mtcnn.onet = await model.mtcnn.onet
+}
 
 //Draw bounding boxes on image:
 model.draw_img(url_img, url_output);
