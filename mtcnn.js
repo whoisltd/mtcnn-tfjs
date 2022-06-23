@@ -106,7 +106,7 @@ class MTCNN{
         var img_in = tf.image.resizeBilinear(img, [hs.dataSync()[0], ws.dataSync()[0]])
         img_in = preprocess(img_in)
         img_in = tf.expandDims(img_in, 0)
-        const data = (await this.pnet).predict(img_in) 
+        const data = this.pnet.predict(img_in) 
         
         // probs, offsets
         var [probs, offsets] = data
@@ -189,7 +189,7 @@ class MTCNN{
         // """
 
         var img_boxes = get_image_boxes(boxes, img, height, width, num_boxes, 24)
-        const data = (await this.rnet).predict(img_boxes)
+        const data = this.rnet.predict(img_boxes)
         
         var [probs, offsets] = data
 
@@ -228,7 +228,7 @@ class MTCNN{
 
         const img_boxes = get_image_boxes(boxes, img, height, width, num_boxes, 48)
         
-        const data = (await this.onet).predict(img_boxes)
+        const data = this.onet.predict(img_boxes)
 
         var [probs, offsets, landmarks] = data
 
