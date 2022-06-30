@@ -3,15 +3,19 @@ const Model = require('./models');
 const {calibrate_box, convert_to_square, get_image_boxes, generate_boxes, preprocess} = require('./box_utils');
 
 
-DEF_THRESHOLDS = [0.7, 0.8, 0.9]
+DEF_THRESHOLDS = [0.5, 0.5, 0.5]
 DEF_NMS_THRESHOLDS = [0.6, 0.6, 0.6]
 
 class MTCNN{
     // Top level class for mtcnn detection.
-    constructor(pnet_path, rnet_path, onter_path, min_face_size=20.0, thresholds=null, mns_thresholds=null, max_output_size=300){
+    constructor(pnet_path, rnet_path, onet_path, 
+                min_face_size=20.0, 
+                thresholds=null, 
+                mns_thresholds=null, 
+                max_output_size=300){
         this.pnet = Model(pnet_path)
         this.rnet = Model(rnet_path)
-        this.onet = Model(onter_path)
+        this.onet = Model(onet_path)
         this.min_face_size = min_face_size
         this.thresholds = thresholds || DEF_THRESHOLDS
         this.mns_thresholds = mns_thresholds || DEF_NMS_THRESHOLDS
@@ -31,20 +35,18 @@ class MTCNN{
         //                 first 5 numbers of array are x coords, last are y coords
         //     scores: float tensor of shape [n], confidence scores
         // """
-
         var [height, width] = img.shape
-        
         const scales = this.get_scale(height, width)
 
         var boxes = await this.stage_one(img, scales)
         if (boxes.shape[0] == 0){
-            return []
+            return {boxes: null, landmarks: null, scores: null}
         }
 
         boxes = await this.stage_two(img, boxes, height, width, boxes.shape[0])
 
         if (boxes.shape[0] == 0){
-            return []
+            return {boxes: null, landmarks: null, scores: null}
         }
         
         const data = await this.stage_three(img, boxes, height, width, boxes.shape[0])
@@ -106,10 +108,7 @@ class MTCNN{
         var img_in = tf.image.resizeBilinear(img, [hs.dataSync()[0], ws.dataSync()[0]])
         img_in = preprocess(img_in)
         img_in = tf.expandDims(img_in, 0)
-        const data = this.pnet.predict(img_in) 
-        
-        // probs, offsets
-        var [probs, offsets] = data
+        var [probs, offsets] = this.pnet.predict(img_in) 
 
         const probs_zero = tf.tensor(probs.arraySync()[0])
         const offsets_zero = tf.tensor(offsets.arraySync()[0])

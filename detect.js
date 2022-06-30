@@ -3,6 +3,10 @@ const sharp = require('sharp');
 const fs = require('fs');
 var mtcnn_js = require('./mtcnn');
 const canvas = require('canvas');
+// const cv = require('opencv4nodejs');
+const Jimp = require('jimp');
+
+
  
 // const pnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json'
 // const rnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json'
@@ -21,17 +25,17 @@ class MTCNN {
 
     async load_img(img_url){
         try {
-            var img = await sharp(img_url).rotate().toBuffer()
+            var img = await sharp(img_url).toFormat('png').removeAlpha().rotate().toBuffer()
         } catch (error) {
             console.log(error);
-            return;
+            return error;
         }
         
         try {
             var tensor = tf.node.decodeImage(img)
         } catch (error) {
             console.log(error);
-            return;
+            return error;
         }
         return {img, tensor}
     }
@@ -108,6 +112,11 @@ class MTCNN {
 
         const {boxes, landmarks, scores} = data
 
+        if(boxes == null){
+            console.error('Image does not contain a face or image quality is too bad.\nPlease try another image.')
+            return false
+        }
+
         boxes[0] = Math.max(0, boxes[0])
         boxes[1] = Math.max(0, boxes[1])
 
@@ -120,10 +129,16 @@ class MTCNN {
 }
 
 exports.MTCNN = MTCNN;
+// async function test(){
+//     const pnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json'
+//     const rnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json'
+//     const onet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json'
+//     mtn = new MTCNN(pnet_url, rnet_url, onet_url)
+//     mtn.mtcnn.pnet = await mtn.mtcnn.pnet
+//     mtn.mtcnn.rnet = await mtn.mtcnn.rnet
+//     mtn.mtcnn.onet = await mtn.mtcnn.onet
 
-// const pnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/pnet/model.json'
-// const rnet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/rnet/model.json'
-// const onet_url = 'https://storage.googleapis.com/my-mtcnn-models/final_model/onet/model.json'
-// mtn = new MTCNN(pnet_url, rnet_url, onet_url)
+//     mtn.crop_face('/home/whoisltd/Downloads/peww.jpg', null, true)
+// }
 
-// mtn.crop_face('/home/whoisltd/works/jits-ai-backend/assets/images/8.jpg', null, true)
+// test() 
